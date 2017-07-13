@@ -21,9 +21,15 @@ module Freakazoid
         
         stream.operations(:comment) do |comment|
           next if comment.author == account_name # no self-reply
-          metadata = JSON.parse(comment.json_metadata) rescue {}
-          users = metadata['users'] || []
-          next unless users.include? account_name
+          
+          if comment.parent_author == account_name
+            debug "Reply to #{account_name} by #{comment.author}"
+          else
+            # Not a reply, check if there's a mention instead.
+            metadata = JSON.parse(comment.json_metadata) rescue {}
+            users = metadata['users'] || []
+            next unless users.include? account_name
+          end
           
           reply(find_comment(comment.author, comment.permlink))
         end
