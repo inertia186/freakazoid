@@ -93,6 +93,8 @@ module Freakazoid
         parent_permlink = comment.parent_permlink
         parent_author = comment.parent_author
         timestamp = comment.timestamp
+        metadata = JSON.parse(comment.json_metadata) rescue {}
+        tags = metadata['tags'] || []
           
         debug "Replying to #{author}/#{permlink}"
       
@@ -105,14 +107,21 @@ module Freakazoid
             body: clever_response
           }
           
+          reply_metadata = {
+            app: Freakazoid::AGENT_ID
+          }
+          
+          reply_metadata[:tags] = [tags.first] if tags.any?
+          reply_permlink = "re-#{author.gsub(/[^a-z0-9\-]+/, '-')}-#{permlink.split('-')[1..-2]}-#{Time.now.utc.strftime('%Y%m%dt%H%M%S%Lz')}" # e.g.: 20170225t235138025z
+          
           comment = {
             type: :comment,
             parent_permlink: permlink,
             author: account_name,
-            permlink: "re-#{author.gsub(/[^a-z0-9\-]+/, '-')}-#{permlink}-#{Time.now.utc.strftime('%Y%m%dt%H%M%S%Lz')}", # e.g.: 20170225t235138025z
+            permlink: reply_permlink,
             title: '',
             body: merge(merge_options),
-            json_metadata: "{\"tags\":[\"#{permlink}\"],\"app\":\"#{Freakazoid::AGENT_ID}\"}",
+            json_metadata: reply_metadata.to_json,
             parent_author: author
           }
           
