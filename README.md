@@ -111,13 +111,13 @@ If you're still having problems, I suggest starting a new clone.
 
 #### Troubleshooting
 
-##### Problem: Everything looks ok, but every time Freakazoid tries to vote, I get this error:
+##### Problem: Everything looks ok, but every time Freakazoid tries to reply, I get this error:
 
 ```
-Unable to vote with <account>.  Invalid version
+Unable to reply with <account>.  Invalid version
 ```
 
-##### Solution: You're trying to vote with an invalid key.
+##### Solution: You're trying to reply with an invalid key.
 
 Make sure the `.yml` file contains the correct voting key and account name (`social` is just for testing).
 
