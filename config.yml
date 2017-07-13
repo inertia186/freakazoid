@@ -1,0 +1,19 @@
+:freakazoid:
+  # mode: head - the last block
+  # mode: irreversible - the block that is confirmed by 2/3 of all block
+  # producers and is thus irreversible!
+  :block_mode: irreversible
+  
+  # Account name for replying.
+  :account_name: <your STEEM bot name>
+  
+  # Posting wif is used to reply with a comment.  See `support/reply.md` to
+  # customize the comment.
+  :posting_wif: <your STEEM bot posting key>
+  
+  # Register your bot and get a key: https://www.cleverbot.com/api/
+  :cleverbot_api_key: <your cleverbot api key>
+
+:chain_options:
+  :chain: steem
+  :url: https://steemd.steemit.com
