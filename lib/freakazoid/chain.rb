@@ -71,8 +71,13 @@ module Freakazoid
     
     def reply(comment)
       clever_response = nil
+      metadata = JSON.parse(comment.json_metadata) rescue {}
+      tags = metadata['tags'] || []
       
       begin
+        s = comment.body
+        quote = s[rand(s.length), rand(s.length - 1) + 1]
+        quote += ' ' + tags.join(' #')
         clever_response = clever.send_message(comment.body)
       rescue => e
         error e.inspect, backtrace: e.backtrace
@@ -93,8 +98,6 @@ module Freakazoid
         parent_permlink = comment.parent_permlink
         parent_author = comment.parent_author
         timestamp = comment.timestamp
-        metadata = JSON.parse(comment.json_metadata) rescue {}
-        tags = metadata['tags'] || []
           
         debug "Replying to #{author}/#{permlink}"
       
@@ -112,7 +115,7 @@ module Freakazoid
           }
           
           reply_metadata[:tags] = [tags.first] if tags.any?
-          reply_permlink = "re-#{author.gsub(/[^a-z0-9\-]+/, '-')}-#{permlink.split('-')[1..-2].join('-')}-#{Time.now.utc.strftime('%Y%m%dt%H%M%S%Lz')}" # e.g.: 20170225t235138025z
+          reply_permlink = "re-#{author.gsub(/[^a-z0-9\-]+/, '-')}-#{permlink.split('-')[0..5][1..-2].join('-')}-#{Time.now.utc.strftime('%Y%m%dt%H%M%S%Lz')}" # e.g.: 20170225t235138025z
           
           comment = {
             type: :comment,
@@ -146,7 +149,7 @@ module Freakazoid
               sleep Random.rand(20..40) # stagger retry
               redo
             elsif message.to_s =~ /STEEMIT_MAX_PERMLINK_LENGTH: permlink is too long/
-              error "Failed comment: permlink too long; only vote"
+              error "Failed comment: permlink too long"
               break
             elsif message.to_s =~ /missing required posting authority/
               error "Failed vote: Check posting key."
@@ -165,7 +168,7 @@ module Freakazoid
               redo
             end
           end
-
+          
           info response unless response.nil?
           
           break
