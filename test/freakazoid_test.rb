@@ -5,6 +5,8 @@ module Freakazoid
     include Config
     
     def setup
+      app_key :freakazoid
+      agent_id AGENT_ID
       override_config(
         freakazoid: {
           block_mode: 'irreversible',

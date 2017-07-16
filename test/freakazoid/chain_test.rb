@@ -5,8 +5,10 @@ module Freakazoid
     include Chain
     
     def setup
+      app_key :freakazoid
+      agent_id AGENT_ID
       override_config(
-        drotto: {
+        freakazoid: {
           block_mode: 'irreversible',
           account_name: 'social',
           posting_wif: '5JrvPrQeBBvCRdjv29iDvkwn3EQYZ9jqfAHzrCyUvfbEbRkrYFC',

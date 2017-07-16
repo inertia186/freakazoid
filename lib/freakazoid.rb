@@ -1,8 +1,8 @@
-require 'radiator'
+require 'krang'
 require 'ruby-cleverbot-api'
 require 'awesome_print'
 require 'yaml'
-require 'pry'
+# require 'pry'
 
 Bundler.require
 
@@ -14,6 +14,9 @@ module Freakazoid
   
   extend self
   
+  app_key :freakazoid
+  agent_id AGENT_ID
+  
   def run
     loop do
       begin
@@ -21,12 +24,16 @@ module Freakazoid
         
         stream.operations(:comment) do |comment|
           next if comment.author == account_name # no self-reply
+          metadata = JSON.parse(comment.json_metadata) rescue {}
+          apps = metadata['apps'] || []
+          
+          next if except_apps.any? && (apps & only_apps).any?
+          next if only_apps.any? && (apps & only_apps).none?
           
           if comment.parent_author == account_name
             debug "Reply to #{account_name} by #{comment.author}"
           else
             # Not a reply, check if there's a mention instead.
-            metadata = JSON.parse(comment.json_metadata) rescue {}
             users = metadata['users'] || []
             next unless users.include? account_name
           end

@@ -11,8 +11,7 @@ PATH
   remote: .
   specs:
     freakazoid (0.0.1)
-      awesome_print
-      radiator
+      krang
       rdiscount
       ruby-cleverbot-api (~> 1.0, >= 1.0.6)
 
@@ -45,6 +44,9 @@ GEM
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     json (1.8.6)
+    krang (0.0.1rc2)
+      awesome_print (~> 1.8, >= 1.8.0)
+      radiator (~> 0.2, >= 0.2.2)
     little-plugger (1.1.4)
     logging (2.2.2)
       little-plugger (~> 1.1)
