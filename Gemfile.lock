@@ -1,18 +1,10 @@
-GIT
-  remote: https://github.com/Reaver01/cleverbot_rb.git
-  revision: b051f5df41ccc44e527229f7b5f59d58a4298ef2
-  branch: master
-  specs:
-    cleverbot_rb (1.0.0)
-      json
-      rest-client
-
 PATH
   remote: .
   specs:
-    freakazoid (0.0.1)
+    freakazoid (0.0.2rc1)
       krang
       rdiscount
+      rest-client
       ruby-cleverbot-api (~> 1.0, >= 1.0.6)
 
 GEM
@@ -108,7 +100,6 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.11)
   byebug
-  cleverbot_rb!
   codeclimate-test-reporter (~> 0.5.2)
   delorean
   faraday
