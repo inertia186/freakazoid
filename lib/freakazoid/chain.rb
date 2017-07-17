@@ -11,9 +11,13 @@ module Freakazoid
       tags = metadata['tags'] || []
       
       begin
-        s = comment.body
-        quote = s[rand(s.length), rand(s.length - 1) + 1]
-        quote += ' ' + tags.join(' ')
+        quote = if comment.body.size > 140
+          s = comment.body
+          s = s[rand(s.length), rand(s.length - 1) + 1]
+        else
+          comment.body
+        end + ' ' + tags.join(' ')
+        
         clever_response = clever.send_message(quote, comment.author)
       rescue => e
         error e.inspect, backtrace: e.backtrace
