@@ -18,7 +18,7 @@
   # other instances of freakazoid and all known engagement bots.
   :except_apps: freakazoid meep_bot
   
-  # List of apps for this bot to pay attention to (whitelist).  Useful you'd
+  # List of apps for this bot to pay attention to (whitelist).  Useful if you'd
   # like to focus only on these apps/sites.
   # :only_apps: steemit esteem chainbb streemian busy 
 

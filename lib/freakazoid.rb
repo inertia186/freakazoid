@@ -25,10 +25,11 @@ module Freakazoid
         stream.operations(:comment) do |comment|
           next if comment.author == account_name # no self-reply
           metadata = JSON.parse(comment.json_metadata) rescue {}
-          apps = metadata['apps'] || []
+          app = metadata['app'] || ''
+          app_name = app.split('/').first
           
-          next if except_apps.any? && (apps & only_apps).any?
-          next if only_apps.any? && (apps & only_apps).none?
+          next if except_apps.any? && except_apps.include?(app_name)
+          next if only_apps.any? && !only_apps.include?(app_name)
           
           if comment.parent_author == account_name
             debug "Reply to #{account_name} by #{comment.author}"
