@@ -21,5 +21,13 @@ module Freakazoid
     def only_apps
       (default_value(:only_apps) || config[app_key][:only_apps]).to_s.split(' ')
     end
+    
+    def vote_weight
+      ((default_value(:vote_weight) || config[app_key][:vote_weight] || '0.00 %').to_f * 100.0).to_i
+    end
+    
+    def self_vote_weight
+      ((default_value(:self_vote_weight) || config[app_key][:self_vote_weight] || '0.00 %').to_f * 100.0).to_i
+    end
   end
 end

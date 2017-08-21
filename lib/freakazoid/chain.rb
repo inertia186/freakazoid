@@ -68,8 +68,30 @@ module Freakazoid
             parent_author: author
           }
           
+          parent_vote = if vote_weight != 0
+            {
+              type: :vote,
+              voter: account_name,
+              author: author,
+              permlink: permlink,
+              weight: vote_weight
+            }
+          end
+          
+          self_vote = if self_vote_weight != 0
+            {
+              type: :vote,
+              voter: account_name,
+              author: account_name,
+              permlink: reply_permlink,
+              weight: self_vote_weight
+            }
+          end
+          
           tx = Radiator::Transaction.new(chain_options.merge(wif: posting_wif))
           tx.operations << comment
+          tx.operations << parent_vote if !!parent_vote
+          tx.operations << self_vote if !!self_vote
           
           response = nil
           
