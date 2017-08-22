@@ -91,7 +91,9 @@ module Freakazoid
           tx = Radiator::Transaction.new(chain_options.merge(wif: posting_wif))
           tx.operations << comment
           
-          tx.operations << votes[0] if votes.size > 0
+          if votes.size > 0
+            tx.operations << votes[0]
+          end
           
           response = nil
           
