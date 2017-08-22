@@ -37,7 +37,7 @@ module Freakazoid
         permlink = comment.permlink
         parent_permlink = comment.parent_permlink
         parent_author = comment.parent_author
-        timestamp = comment.timestamp
+        votes = []
           
         debug "Replying to #{author}/#{permlink}"
       
@@ -68,7 +68,7 @@ module Freakazoid
             parent_author: author
           }
           
-          parent_vote = if vote_weight != 0
+          votes << if vote_weight != 0
             {
               type: :vote,
               voter: account_name,
@@ -78,7 +78,7 @@ module Freakazoid
             }
           end
           
-          self_vote = if self_vote_weight != 0
+          votes << if self_vote_weight != 0
             {
               type: :vote,
               voter: account_name,
@@ -90,8 +90,8 @@ module Freakazoid
           
           tx = Radiator::Transaction.new(chain_options.merge(wif: posting_wif))
           tx.operations << comment
-          tx.operations << parent_vote if !!parent_vote
-          tx.operations << self_vote if !!self_vote
+          
+          tx.operations << votes[0] if votes.size > 0
           
           response = nil
           
@@ -134,6 +134,17 @@ module Freakazoid
           info response unless response.nil?
           
           break
+        end
+          
+        begin
+          if votes.size > 1
+            sleep 3
+            tx = Radiator::Transaction.new(chain_options.merge(wif: posting_wif))
+            tx.operations << votes[1]
+            tx.process(true)
+          end
+        rescue => e
+          warning "Unable to vote: #{e}", e
         end
       end
     end
