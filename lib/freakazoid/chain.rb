@@ -148,8 +148,10 @@ module Freakazoid
             }
           end
           
+          tx = Radiator::Transaction.new(chain_options.merge(wif: posting_wif))
+          
           if follow_back?
-            if followed_by?(author) && !following(author)
+            if followed_by?(author) && !following?(author)
               tx.operations << {
                 type: :custom_json,
                 required_auths: [],
@@ -166,7 +168,6 @@ module Freakazoid
             end
           end
           
-          tx = Radiator::Transaction.new(chain_options.merge(wif: posting_wif))
           tx.operations << comment
           
           if votes.size > 0
