@@ -22,7 +22,12 @@
   # like to focus only on these apps/sites.
   # :only_apps: steemit esteem chainbb streemian busy 
   
-  # When non-zero, vote for the author while replying.
+  # When someone follows the bot and replies, the bot will follow them, if this
+  # value is true.
+  :follow_back: false
+  
+  # When non-zero, vote for the author while replying (if the author follows 
+  # the bot).
   :vote_weight: 0.00 %
     
   # When non-zero, vote for self while replying.

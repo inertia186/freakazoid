@@ -22,6 +22,9 @@ module Freakazoid
       (default_value(:only_apps) || config[app_key][:only_apps]).to_s.split(' ')
     end
     
+    def follow_back?
+      (default_value(:follow_back) || config[app_key][:follow_back]).to_s == 'true'
+    end
     def vote_weight
       ((default_value(:vote_weight) || config[app_key][:vote_weight] || '0.00 %').to_f * 100.0).to_i
     end

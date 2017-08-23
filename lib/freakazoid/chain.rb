@@ -5,6 +5,66 @@ module Freakazoid
     include Krang::Chain
     include Utils
     
+    def reset_follow_api
+      @follow_api = nil
+    end
+    
+    def follow_api
+      with_follow_api
+    end
+    
+    def with_follow_api(&block)
+      loop do
+        @follow_api ||= Radiator::FollowApi.new(chain_options)
+        
+        return @follow_api if block.nil?
+        
+        begin
+          yield @follow_api
+          break
+        rescue => e
+          warning "API exception, retrying (#{e})", e
+          reset_follow_api
+          sleep backoff
+          redo
+        end
+      end
+    end
+    
+    def followed_by?(account)
+      followers = []
+      count = -1
+
+      until count == followers.size
+        count = followers.size
+        response = nil
+        with_follow_api do |follow_api|
+          response = follow_api.get_followers(account_name, followers.last, 'blog', 1000)
+        end
+        followers += response.result.map(&:follower)
+        followers = followers.uniq
+      end
+
+      followers.include? account
+    end
+    
+    def following?(account)
+      following = []
+      count = -1
+
+      until count == following.size
+        count = following.size
+        response = nil
+        with_follow_api do |follow_api|
+          response = @follow_api.get_following(account_name, following.last, 'blog', 100)
+        end
+        following += response.result.map(&:following)
+        following = following.uniq
+      end
+
+      following.include? account
+    end
+    
     def reply(comment)
       clever_response = nil
       metadata = JSON.parse(comment.json_metadata) rescue {}
@@ -68,8 +128,8 @@ module Freakazoid
             parent_author: author
           }
           
-          votes << if vote_weight != 0
-            {
+          if vote_weight != 0 && followed_by?(author)
+            votes << {
               type: :vote,
               voter: account_name,
               author: author,
@@ -78,14 +138,32 @@ module Freakazoid
             }
           end
           
-          votes << if self_vote_weight != 0
-            {
+          if self_vote_weight != 0
+            votes << {
               type: :vote,
               voter: account_name,
               author: account_name,
               permlink: reply_permlink,
               weight: self_vote_weight
             }
+          end
+          
+          if follow_back?
+            if followed_by?(author) && !following(author)
+              tx.operations << {
+                type: :custom_json,
+                required_auths: [],
+                required_posting_auths: [account_name],
+                id: 'follow',
+                json: [
+                  :follow, {
+                    follower: account_name,
+                    following: author,
+                    what: [:blog]
+                  }
+                ].to_json
+              }
+            end
           end
           
           tx = Radiator::Transaction.new(chain_options.merge(wif: posting_wif))

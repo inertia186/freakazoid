@@ -24,6 +24,14 @@ module Freakazoid
       assert_nil reset_api
     end
     
+    def test_reset_follow_api
+      assert_nil reset_follow_api
+    end
+    
+    def test_follow_api
+      assert follow_api
+    end
+    
     def test_backoff
       assert backoff
     end
@@ -52,8 +60,20 @@ module Freakazoid
       assert_nil find_comment('bogus', 'bogus')
     end
     
+    def test_followed_by
+      assert followed_by?('papa-pepper')
+    end
+    
+    def test_following
+      assert following?('papa-pepper')
+    end
+    
     def test_reply
       result = reply(find_comment('inertia', 'macintosh-napintosh'))
+    end
+    
+    def test_reply_comment
+      result = reply(find_comment('admin', 'firstpost'))
     end
   end
 end

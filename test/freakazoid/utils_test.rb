@@ -20,6 +20,10 @@ module Freakazoid
       )
     end
     
+    def test_reset_clever
+      refute reset_clever
+    end
+    
     def test_name_error
       assert_raises NameError do
         assert reset_api
@@ -96,6 +100,21 @@ module Freakazoid
       }
       
       expected_merge = "body\n"
+      assert_equal expected_merge, merge(merge_options)
+    end
+    
+    def test_merge_with_from
+      merge_options = {
+        markup: :html,
+        content_type: 'content_type',
+        vote_weight_percent: 'vote_weight_percent',
+        vote_type: 'vote_type',
+        account_name: 'account_name',
+        from: ['foo'],
+        body: 'body'
+      }
+      
+      expected_merge = "<p>body</p>\n"
       assert_equal expected_merge, merge(merge_options)
     end
     
