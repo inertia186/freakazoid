@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    freakazoid (0.0.2rc7)
+    freakazoid (0.0.2)
       krang
       rdiscount
       rest-client

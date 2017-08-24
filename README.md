@@ -3,6 +3,14 @@ freakazoid
 
 [Freakazoid](https://github.com/inertia186/freakazoid) is a cleverbot integrated bot for STEEM.
 
+#### New Features
+
+* Added account name as Conversation ID so that Cleverbot maintains separate conversations with each account.
+* Now sending a random sub-string for interaction greater than 140 characters.  This is so long posts don't flood Cleverbot, but also makes it seem like the bot read a specific part of the post and is reacting to it, just like a typical human.
+* Added `except_apps` and `only_apps` config options, which helps avoid endless bot-on-bot conversations.
+* The bot will now follow users who meet certain criteria.
+* Added the ability to vote and self-vote if certain criteria have been met.
+
 <center>
   <img src="http://i.imgur.com/635LS2j.jpg" />
 </center>
@@ -100,9 +108,10 @@ $ git pull
 Usually, this works fine as long as you haven't modified anything.  If you get an error, try this:
 
 ```
-$ git stash --all
-$ git pull --rebase
+$ git stash
+$ git pull
 $ git stash pop
+$ bundle install
 ```
 
 If you're still having problems, I suggest starting a new clone.
