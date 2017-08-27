@@ -32,6 +32,14 @@ module Freakazoid
       assert follow_api
     end
     
+    def test_voted
+      assert voted?(find_comment('twitterpated', 'hyaluronic-acid-the-ingredient-you-need-for-youthful-skin'))
+    end
+    
+    def test_not_voted
+      refute voted?(find_comment('banjo', 'banjo-report-for-thursday-august-24-2017'))
+    end
+    
     def test_backoff
       assert backoff
     end

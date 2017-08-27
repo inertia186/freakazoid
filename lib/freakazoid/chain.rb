@@ -65,6 +65,18 @@ module Freakazoid
       following.include? account
     end
     
+    def voted?(comment)
+      return false if comment.nil?
+      voters = comment.active_votes
+      
+      if voters.map(&:voter).include? account_name
+        debug "Already voted for: #{comment.author}/#{comment.permlink} (id: #{comment.id})"
+        true
+      else
+        false
+      end
+    end
+
     def reply(comment)
       clever_response = nil
       metadata = JSON.parse(comment.json_metadata) rescue {}
@@ -117,7 +129,7 @@ module Freakazoid
           reply_metadata[:tags] = [tags.first] if tags.any?
           reply_permlink = "re-#{author.gsub(/[^a-z0-9\-]+/, '-')}-#{permlink.split('-')[0..5][1..-2].join('-')}-#{Time.now.utc.strftime('%Y%m%dt%H%M%S%Lz')}" # e.g.: 20170225t235138025z
           
-          comment = {
+          reply = {
             type: :comment,
             parent_permlink: permlink,
             author: account_name,
@@ -128,7 +140,7 @@ module Freakazoid
             parent_author: author
           }
           
-          if vote_weight != 0 && followed_by?(author)
+          if vote_weight != 0 && followed_by?(author) && !voted?(comment)
             votes << {
               type: :vote,
               voter: account_name,
@@ -168,7 +180,7 @@ module Freakazoid
             end
           end
           
-          tx.operations << comment
+          tx.operations << reply
           
           if votes.size > 0
             tx.operations << votes[0]
