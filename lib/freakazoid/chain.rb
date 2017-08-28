@@ -73,7 +73,7 @@ module Freakazoid
         300
       end
       
-      @semaphore.synchronize do
+      semaphore.synchronize do
         response = nil
         with_api do |api| 
           response = api.get_account_history(account_name, -limit, limit)
