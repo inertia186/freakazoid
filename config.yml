@@ -27,7 +27,7 @@
   :follow_back: false
   
   # When non-zero, vote for the author only occure after this many minutes.
-  unique_author: 1440
+  :unique_author: 1440
   
   # When non-zero, vote for the author while replying (if the author follows 
   # the bot).
