@@ -25,6 +25,11 @@ module Freakazoid
     def follow_back?
       (default_value(:follow_back) || config[app_key][:follow_back]).to_s == 'true'
     end
+    
+    def unique_author
+      (default_value(:unique_author) || config[app_key][:unique_author] || '0').to_i
+    end
+    
     def vote_weight
       ((default_value(:vote_weight) || config[app_key][:vote_weight] || '0.00 %').to_f * 100.0).to_i
     end

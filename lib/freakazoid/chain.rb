@@ -65,6 +65,53 @@ module Freakazoid
       following.include? account
     end
     
+    def voted_for_authors
+      @voted_for_authors ||= {}
+      limit = if @voted_for_authors.empty?
+        10000
+      else
+        300
+      end
+      
+      @semaphore.synchronize do
+        response = nil
+        with_api do |api| 
+          response = api.get_account_history(account_name, -limit, limit)
+        end
+        result = response.result
+        result.reverse.each do |i, tx|
+          op = tx['op']
+          next unless op[0] == 'vote'
+          
+          timestamp = Time.parse(tx['timestamp'] + 'Z')
+          latest = @voted_for_authors[op[1]['author']]
+          
+          if latest.nil? || latest < timestamp
+            @voted_for_authors[op[1]['author']] = timestamp
+          end
+        end
+      end
+      
+      @voted_for_authors
+    end
+
+    def already_voted_for?(author)
+      return false if unique_author == 0
+      
+      now = Time.now.utc
+      voted_in_threshold = []
+      
+      voted_for_authors.each do |author, vote_at|
+        if now - vote_at < unique_author * 60
+          voted_in_threshold << author
+        end
+      end
+      
+      return true if voted_in_threshold.include? author
+      
+      false
+    end
+
     def voted?(comment)
       return false if comment.nil?
       voters = comment.active_votes
