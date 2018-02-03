@@ -20,7 +20,6 @@ require 'minitest/autorun'
 require 'vcr'
 require 'yaml'
 require 'pry'
-require 'typhoeus/adapters/faraday'
 require 'securerandom'
 require 'delorean'
 
