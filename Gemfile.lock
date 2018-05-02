@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    freakazoid (0.0.4pre1)
+    freakazoid (0.0.4pre2)
       krang
       rdiscount (~> 2.2, >= 2.2.0.1)
       rest-client (~> 2.0, >= 2.0.2)

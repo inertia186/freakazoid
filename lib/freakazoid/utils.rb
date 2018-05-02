@@ -38,5 +38,12 @@ module Freakazoid
       when :markdown then merged
       end
     end
+    
+    def extract_app_name(metadata)
+      app = metadata['app'] || '' rescue nil
+      app_name = app.split('/').first rescue nil
+      
+      app_name || 'unknown'
+    end
   end
 end

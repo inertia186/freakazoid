@@ -121,5 +121,12 @@ module Freakazoid
     def test_merge_nil
       refute merge
     end
+    
+    def test_extract_app_name
+      assert_equal 'steemit', extract_app_name({'app' => 'steemit/1.0'})
+      assert_equal 'unknown', extract_app_name({})
+      assert_equal 'unknown', extract_app_name('')
+      assert_equal 'unknown', extract_app_name(nil)
+    end
   end
 end
