@@ -40,10 +40,16 @@ module Freakazoid
     end
     
     def extract_app_name(metadata)
-      app = metadata['app'] || '' rescue nil
+      app = metadata['app'] rescue nil
       app_name = app.split('/').first rescue nil
       
       app_name || 'unknown'
+    end
+    
+    def extract_users(metadata)
+      users = metadata['users'] rescue nil
+      
+      users || []
     end
   end
 end

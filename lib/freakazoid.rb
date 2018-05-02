@@ -34,7 +34,7 @@ module Freakazoid
             krang_debug "Reply to #{account_name} by #{comment.author}"
           else
             # Not a reply, check if there's a mention instead.
-            users = metadata['users'] || []
+            users = extract_users(metadata)
             next unless users.include? account_name
             krang_debug "Mention of #{account_name} by #{comment.author}"
           end

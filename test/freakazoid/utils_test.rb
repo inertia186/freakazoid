@@ -128,5 +128,12 @@ module Freakazoid
       assert_equal 'unknown', extract_app_name('')
       assert_equal 'unknown', extract_app_name(nil)
     end
+    
+    def test_extract_users
+      assert_equal ['alice', 'bob'], extract_users({'users' => ['alice', 'bob']})
+      assert_equal [], extract_users({})
+      assert_equal [], extract_users('')
+      assert_equal [], extract_users(nil)
+    end
   end
 end
