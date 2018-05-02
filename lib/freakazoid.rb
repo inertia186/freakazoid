@@ -26,24 +26,24 @@ module Freakazoid
           next if comment.author == account_name # no self-reply
           metadata = JSON.parse(comment.json_metadata) rescue {}
           app = metadata['app'] || ''
-          app_name = app.split('/').first
+          app_name = app.split('/').first rescue 'unknown'
           
           next if except_apps.any? && except_apps.include?(app_name)
           next if only_apps.any? && !only_apps.include?(app_name)
           
           if comment.parent_author == account_name
-            debug "Reply to #{account_name} by #{comment.author}"
+            krang_debug "Reply to #{account_name} by #{comment.author}"
           else
             # Not a reply, check if there's a mention instead.
             users = metadata['users'] || []
             next unless users.include? account_name
-            debug "Mention of #{account_name} by #{comment.author}"
+            krang_debug "Mention of #{account_name} by #{comment.author}"
           end
           
           reply(find_comment(comment.author, comment.permlink))
         end
       rescue => e
-        warning e.inspect, e
+        krang_warning e.inspect, e
         reset_api
         sleep backoff
       end

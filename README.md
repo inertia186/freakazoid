@@ -75,7 +75,7 @@ Edit the `config.yml` file.
 
 :chain_options:
   :chain: steem
-  :url: https://steemd.steemit.com
+  :url: https://api.steemit.com
 ```
 
 In order to integrate with Cleverbot, you need to register your bot and get a key: https://www.cleverbot.com/api/

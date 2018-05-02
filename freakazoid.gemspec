@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'bundler', '~> 1.15', '>= 1.15.4'
   spec.add_development_dependency 'rake', '~> 12.1', '>= 12.1.0'
-  spec.add_development_dependency 'minitest', '~> 5.9', '>= 5.9.0'
+  spec.add_development_dependency 'minitest', '5.10.3'
   spec.add_development_dependency 'minitest-line', '~> 0.6.3'
   spec.add_development_dependency 'minitest-proveit'
   spec.add_development_dependency 'webmock', '~> 3.1', '>= 3.1.0'

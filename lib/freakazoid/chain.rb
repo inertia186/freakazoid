@@ -23,7 +23,7 @@ module Freakazoid
           yield @follow_api
           break
         rescue => e
-          warning "API exception, retrying (#{e})", e
+          krang_warning "API exception, retrying (#{e})", e
           reset_follow_api
           sleep backoff
           redo
@@ -39,9 +39,9 @@ module Freakazoid
         count = followers.size
         response = nil
         with_follow_api do |follow_api|
-          response = follow_api.get_followers(account_name, followers.last, 'blog', 1000)
+          response = follow_api.get_followers(account: account_name, start: followers.last, type: 'blog', limit: 1000)
         end
-        followers += response.result.map(&:follower)
+        followers += response.result.followers.map(&:follower)
         followers = followers.uniq
       end
 
@@ -56,9 +56,9 @@ module Freakazoid
         count = following.size
         response = nil
         with_follow_api do |follow_api|
-          response = @follow_api.get_following(account_name, following.last, 'blog', 100)
+          response = @follow_api.get_following(account: account_name, start: following.last, type: 'blog', limit: 100)
         end
-        following += response.result.map(&:following)
+        following += response.result.following.map(&:following)
         following = following.uniq
       end
 
@@ -117,7 +117,7 @@ module Freakazoid
       voters = comment.active_votes
       
       if voters.map(&:voter).include? account_name
-        debug "Already voted for: #{comment.author}/#{comment.permlink} (id: #{comment.id})"
+        krang_debug "Already voted for: #{comment.author}/#{comment.permlink} (id: #{comment.id})"
         true
       else
         false
@@ -139,8 +139,8 @@ module Freakazoid
         
         clever_response = clever.send_message(quote, comment.author)
       rescue => e
-        error e.inspect, backtrace: e.backtrace
-        debug 'Resetting cleverbot.'
+        krang_error e.inspect, backtrace: e.backtrace
+        krang_debug 'Resetting cleverbot.'
         reset_clever
       end
       
@@ -158,7 +158,7 @@ module Freakazoid
         parent_author = comment.parent_author
         votes = []
           
-        debug "Replying to #{author}/#{permlink}"
+        krang_debug "Replying to #{author}/#{permlink}"
       
         loop do
           merge_options = {
@@ -241,37 +241,37 @@ module Freakazoid
               response = tx.process(true)
             end
           rescue => e
-            warning "Unable to reply: #{e}", e
+            krang_warning "Unable to reply: #{e}", e
           end
           
           if !!response && !!response.error
             message = response.error.message
             if message.to_s =~ /You may only comment once every 20 seconds./
-              warning "Retrying comment: commenting too quickly."
+              krang_warning "Retrying comment: commenting too quickly."
               sleep Random.rand(20..40) # stagger retry
               redo
             elsif message.to_s =~ /STEEMIT_MAX_PERMLINK_LENGTH: permlink is too long/
-              error "Failed comment: permlink too long"
+              krang_error "Failed comment: permlink too long"
               break
             elsif message.to_s =~ /missing required posting authority/
-              error "Failed vote: Check posting key."
+              krang_error "Failed vote: Check posting key."
               break
             elsif message.to_s =~ /unknown key/
-              error "Failed vote: unknown key (testing?)"
+              krang_error "Failed vote: unknown key (testing?)"
               break
             elsif message.to_s =~ /tapos_block_summary/
-              warning "Retrying vote/comment: tapos_block_summary (?)"
+              krang_warning "Retrying vote/comment: tapos_block_summary (?)"
               redo
             elsif message.to_s =~ /now < trx.expiration/
-              warning "Retrying vote/comment: now < trx.expiration (?)"
+              krang_warning "Retrying vote/comment: now < trx.expiration (?)"
               redo
             elsif message.to_s =~ /signature is not canonical/
-              warning "Retrying vote/comment: signature was not canonical (bug in Radiator?)"
+              krang_warning "Retrying vote/comment: signature was not canonical (bug in Radiator?)"
               redo
             end
           end
           
-          info response unless response.nil?
+          krang_info response unless response.nil?
           
           break
         end
@@ -284,7 +284,7 @@ module Freakazoid
             tx.process(true)
           end
         rescue => e
-          warning "Unable to vote: #{e}", e
+          krang_warning "Unable to vote: #{e}", e
         end
       end
     end

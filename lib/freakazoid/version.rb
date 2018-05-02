@@ -1,4 +1,4 @@
 module Freakazoid
-  VERSION = '0.0.3rc1'
+  VERSION = '0.0.4pre1'
   AGENT_ID = "freakazoid/#{VERSION}"
 end
