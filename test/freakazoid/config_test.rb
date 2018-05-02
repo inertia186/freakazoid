@@ -14,11 +14,12 @@ module Freakazoid
           posting_wif: '5JrvPrQeBBvCRdjv29iDvkwn3EQYZ9jqfAHzrCyUvfbEbRkrYFC',
           cleverbot_api_key: 'ZmFrZSBjbGV2ZXJib3QgYXBpIGtleQ',
           follow_back: true,
+          unique_author: 1440,
           vote_weight: '1.00 %',
           self_vote_weight: '2.00 %'
         }, chain_options: {
           chain: 'steem',
-          url: 'https://steemd.steemit.com'
+          url: 'https://api.steemit.com'
         }
       )
     end
@@ -45,6 +46,10 @@ module Freakazoid
     
     def test_self_vote_weight
       assert_equal 200, self_vote_weight
+    end
+    
+    def test_unique_author
+      assert_equal 1440, unique_author
     end
   end
 end

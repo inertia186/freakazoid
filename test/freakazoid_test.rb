@@ -15,7 +15,7 @@ module Freakazoid
           cleverbot_api_key: 'ZmFrZSBjbGV2ZXJib3QgYXBpIGtleQ'
         }, chain_options: {
           chain: 'steem',
-          url: 'https://steemd.steemit.com'
+          url: 'https://api.steemit.com'
         }
       )
     end

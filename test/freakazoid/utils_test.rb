@@ -15,7 +15,7 @@ module Freakazoid
           cleverbot_api_key: 'ZmFrZSBjbGV2ZXJib3QgYXBpIGtleQ'
         }, chain_options: {
           chain: 'steem',
-          url: 'https://steemd.steemit.com'
+          url: 'https://api.steemit.com'
         }
       )
     end
@@ -31,27 +31,27 @@ module Freakazoid
     end
     
     def test_trace
-      assert_nil trace "trace"
+      assert_nil krang_trace "trace"
     end
     
     def test_debug
-      assert_nil debug "debug"
+      assert_nil krang_debug "debug"
     end
     
     def test_info
-      assert_nil info "info"
+      assert_nil krang_info "info"
     end
     
     def test_info_detail
-      assert_nil info("info", Exception.new)
+      assert_nil krang_info("info", Exception.new)
     end
     
     def test_warning
-      assert_nil warning "warning"
+      assert_nil krang_warning "warning"
     end
     
     def test_error
-      assert_nil error "error"
+      assert_nil krang_error "error"
     end
     
     def test_unknown_type

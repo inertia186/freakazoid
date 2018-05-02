@@ -12,10 +12,11 @@ module Freakazoid
           block_mode: 'irreversible',
           account_name: 'social',
           posting_wif: '5JrvPrQeBBvCRdjv29iDvkwn3EQYZ9jqfAHzrCyUvfbEbRkrYFC',
-          cleverbot_api_key: 'ZmFrZSBjbGV2ZXJib3QgYXBpIGtleQ'
+          cleverbot_api_key: 'ZmFrZSBjbGV2ZXJib3QgYXBpIGtleQ',
+          unique_author: 1440
         }, chain_options: {
           chain: 'steem',
-          url: 'https://steemd.steemit.com'
+          url: 'https://api.steemit.com'
         }
       )
     end
@@ -73,7 +74,7 @@ module Freakazoid
     end
     
     def test_following
-      assert following?('papa-pepper')
+      refute following?('papa-pepper')
     end
     
     def test_reply
@@ -82,6 +83,10 @@ module Freakazoid
     
     def test_reply_comment
       result = reply(find_comment('admin', 'firstpost'))
+    end
+    
+    def test_already_voted_for
+      refute already_voted_for?('inertia')
     end
   end
 end
