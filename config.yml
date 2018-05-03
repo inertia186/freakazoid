@@ -36,6 +36,9 @@
   # When non-zero, vote for self while replying.
   :self_vote_weight: 0.00 %
 
+  # Mirror mute account names is a list of accounts that this bot will use to
+  # get a list of accounts to mute.
+  :mirror_mute_account_names: inertia ned
 :chain_options:
   :chain: steem
   :url: https://api.steemit.com

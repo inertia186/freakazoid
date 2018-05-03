@@ -65,6 +65,31 @@ module Freakazoid
       following.include? account
     end
     
+    def ignored?(account)
+      all_ignores = []
+      
+      mirror_mute_account_names.each do |ignoring_account_name|
+        ignores = []
+        count = -1
+
+        until count == ignores.size
+          count = ignores.size
+          response = nil
+          with_follow_api do |follow_api|
+            response = follow_api.get_following(account: ignoring_account_name, start: ignores.last, type: 'ignore', limit: 1000)
+          end
+          ignores += response.result.following.map(&:following)
+          ignores = ignores.uniq
+        end
+        
+        all_ignores += ignores
+        all_ignores = all_ignores.uniq
+        ignores = []
+      end
+
+      all_ignores.include? account
+    end
+    
     def voted_for_authors
       @voted_for_authors ||= {}
       limit = if @voted_for_authors.empty?

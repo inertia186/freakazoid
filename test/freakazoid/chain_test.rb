@@ -88,5 +88,10 @@ module Freakazoid
     def test_already_voted_for
       refute already_voted_for?('inertia')
     end
+    
+    def test_ignored
+      refute ignored?('noganoo'), 'did not expect social to ignore noganoo'
+      assert ignored?('fyrstiken'), 'expect social to ignore fyrstikken'
+    end
   end
 end

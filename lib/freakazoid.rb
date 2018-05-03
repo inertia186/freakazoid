@@ -24,6 +24,8 @@ module Freakazoid
         
         stream.operations(:comment) do |comment|
           next if comment.author == account_name # no self-reply
+          next if ignored?(comment.author)
+          
           metadata = JSON.parse(comment.json_metadata) rescue {}
           app_name = extract_app_name(metadata)
           

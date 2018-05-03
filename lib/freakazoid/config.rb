@@ -37,5 +37,9 @@ module Freakazoid
     def self_vote_weight
       ((default_value(:self_vote_weight) || config[app_key][:self_vote_weight] || '0.00 %').to_f * 100.0).to_i
     end
+    
+    def mirror_mute_account_names
+      (default_value(:mirror_mute_account_names) || config[app_key][:mirror_mute_account_names]).to_s.split(' ') + [account_name]
+    end
   end
 end
