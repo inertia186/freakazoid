@@ -59,19 +59,31 @@ module Freakazoid
     end
     
     def find_comment(author, permlink)
-      response = nil
+      # Poll for this comment 21 times, in case we saw it in head block mode, to
+      # also account for the delay time that might be present in the hivemind
+      # blockchain interpretor layer.
       
-      begin
-        with_api { |api| response = api.get_content(author, permlink) }
-      rescue Hive::ArgumentError
-        return nil
+      21.times do |try_num|
+        response = nil
+        
+        begin
+          with_api { |api| response = api.get_content(author, permlink) }
+        rescue Hive::ArgumentError
+          if ENV['FREAKAZOID_TRACE']
+            warn "Did not see #{author}/#{permlink} on chain.  (attempt: #{try_num})."
+          end
+          
+          sleep 3
+          
+          next
+        end
+        
+        comment = response.result
+        
+        warn comment if ENV['FREAKAZOID_TRACE']
+        
+        return comment
       end
-      
-      comment = response.result
-      
-      warn comment if ENV['FREAKAZOID_TRACE']
-      
-      comment unless comment.id == 0
     end
     
     def follow_api

@@ -40,6 +40,10 @@ module Freakazoid
       (default_value(:mirror_mute_account_names) || yml[:freakazoid][:mirror_mute_account_names]).to_s.split(' ') + [account_name]
     end
     
+    def meeseeker_options
+      yml[:meeseeker_options]
+    end
+    
     def chain_options
       yml[:chain_options]
     end

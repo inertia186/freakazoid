@@ -20,28 +20,29 @@ module Freakazoid
       begin
         stream = Radiator::Stream.new(chain_options)
         
-        puts "Freakazoid #{Freakazoid::VERSION} initialized.  Watching for replies and mentions for #{account_name} ..."
+        print "Freakazoid #{Freakazoid::VERSION} initialized.  Watching for replies and mentions for #{account_name} ..."
         
-        stream.operations(:comment) do |comment|
-          next if comment.author == account_name # no self-reply
-          next if ignored?(comment.author)
+        if meeseeker_options
+          require 'redis'
           
-          metadata = JSON.parse(comment.json_metadata) rescue {}
-          app_name = extract_app_name(metadata)
+          puts ' (streaming with meeseeker) ...'
           
-          next if except_apps.any? && except_apps.include?(app_name)
-          next if only_apps.any? && !only_apps.include?(app_name)
+          ctx = Redis.new(url: meeseeker_options[:url])
           
-          if comment.parent_author == account_name
-            puts "Reply to #{account_name} by #{comment.author}"
-          else
-            # Not a reply, check if there's a mention instead.
-            users = extract_users(metadata)
-            next unless users.include? account_name
-            puts "Mention of #{account_name} by #{comment.author}"
+          Redis.new(url: meeseeker_options[:url]).subscribe('hive:op:comment') do |on|
+            on.message do |_, message|
+              payload = JSON[message]
+              comment = Hashie::Mash.new(JSON[ctx.get(payload["key"])]).value
+              
+              process_comment(comment)
+            end
           end
+        else
+          puts ' (streaming directly) ...'
           
-          reply(find_comment(comment.author, comment.permlink))
+          stream.operations(:comment) do |comment|
+            process_comment(comment)
+          end
         end
       rescue => e
         warn e.inspect
@@ -50,5 +51,27 @@ module Freakazoid
         sleep backoff
       end
     end
+  end
+  
+  def process_comment(comment)
+    return if comment.author == account_name # no self-reply
+    return if ignored?(comment.author)
+    
+    metadata = JSON.parse(comment.json_metadata) rescue {}
+    app_name = extract_app_name(metadata)
+    
+    return if except_apps.any? && except_apps.include?(app_name)
+    return if only_apps.any? && !only_apps.include?(app_name)
+    
+    if comment.parent_author == account_name
+      puts "Reply to #{account_name} by #{comment.author}"
+    else
+      # Not a reply, check if there's a mention instead.
+      users = extract_users(metadata)
+      return unless users.include? account_name
+      puts "Mention of #{account_name} by #{comment.author}"
+    end
+    
+    reply(find_comment(comment.author, comment.permlink))
   end
 end

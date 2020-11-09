@@ -7,6 +7,7 @@ freakazoid
 
 * Hive / Eclipse Update
 * Gem Update
+* Added optional support for [`meeseeker`](https://github.com/inertia186/meeseeker).
 
 #### Features
 
@@ -83,8 +84,19 @@ Edit the `config.yml` file.
 
 In order to integrate with Cleverbot, you need to register your bot and get a key: https://www.cleverbot.com/api/
 
-
 Edit the `support/reply.md` template (optional).
+
+#### Meeseeker Support
+
+If you are running a `meeseeker sync`, you can enable this option for streaming by uncommenting the `:meeseeker:` config group of `config.yml`.  If your `meeseeker sync` is running on another host, update the `:url:` line with the correct address.
+ 
+See: https://github.com/inertia186/meeseeker
+
+Example:
+
+```yaml
+:meeseeker_options:
+  :url: redis://127.0.0.1:6379/0
 
 ##### Run Mode
 

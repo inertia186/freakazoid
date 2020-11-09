@@ -33,4 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rest-client', '~> 2.0', '>= 2.0.2' # required by ruby-cleverbot-api
   spec.add_dependency 'ruby-cleverbot-api', '~> 1.0', '>= 1.0.6'
   spec.add_dependency 'rdiscount', '~> 2.2', '>= 2.2.0.1'
+  spec.add_dependency 'redis', '~> 4.2', '>= 4.2.2'
 end

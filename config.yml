@@ -40,6 +40,15 @@
   # Mirror mute account names is a list of accounts that this bot will use to
   # get a list of accounts to mute, in addition to this bot's account_name.
   # :mirror_mute_account_names: 
+
+# If you are running a meeseeker sync, you can enable that for streaming by
+# uncommenting this group.  If the meeseeker sync is running on another host,
+# update the :url: line with the correct address.
+# 
+# See: https://github.com/inertia186/meeseeker
+# :meeseeker_options:
+#   :url: redis://banjo.local:6379/0
+
 :chain_options:
   :chain: hive
   :url: http://anyx.io

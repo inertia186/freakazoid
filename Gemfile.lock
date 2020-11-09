@@ -7,8 +7,9 @@ GIT
 PATH
   remote: .
   specs:
-    freakazoid (0.0.5)
+    freakazoid (0.0.4.pre.5)
       rdiscount (~> 2.2, >= 2.2.0.1)
+      redis (~> 4.2, >= 4.2.2)
       rest-client (~> 2.0, >= 2.0.2)
       ruby-cleverbot-api (~> 1.0, >= 1.0.6)
 
@@ -89,6 +90,7 @@ GEM
     rake (13.0.1)
     rb-readline (0.5.5)
     rdiscount (2.2.0.2)
+    redis (4.2.2)
     reline (0.1.7)
       io-console (~> 0.5)
     rest-client (2.1.0)
