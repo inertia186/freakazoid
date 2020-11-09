@@ -1,4 +1,3 @@
-require 'krang'
 require 'ruby-cleverbot-api'
 require 'awesome_print'
 require 'yaml'
@@ -10,17 +9,18 @@ module Freakazoid
   require 'freakazoid/version'
   require 'freakazoid/chain'
   
+  PWD = Dir.pwd.freeze
+  
   include Chain
   
   extend self
-  
-  app_key :freakazoid
-  agent_id AGENT_ID
   
   def run
     loop do
       begin
         stream = Radiator::Stream.new(chain_options)
+        
+        puts "Freakazoid #{Freakazoid::VERSION} initialized.  Watching for replies and mentions for #{account_name} ..."
         
         stream.operations(:comment) do |comment|
           next if comment.author == account_name # no self-reply
@@ -33,18 +33,19 @@ module Freakazoid
           next if only_apps.any? && !only_apps.include?(app_name)
           
           if comment.parent_author == account_name
-            krang_debug "Reply to #{account_name} by #{comment.author}"
+            puts "Reply to #{account_name} by #{comment.author}"
           else
             # Not a reply, check if there's a mention instead.
             users = extract_users(metadata)
             next unless users.include? account_name
-            krang_debug "Mention of #{account_name} by #{comment.author}"
+            puts "Mention of #{account_name} by #{comment.author}"
           end
           
           reply(find_comment(comment.author, comment.permlink))
         end
       rescue => e
-        krang_warning e.inspect, e
+        warn e.inspect
+        puts e.backtrace.join("\n")
         reset_api
         sleep backoff
       end

@@ -4,9 +4,12 @@ module Freakazoid
   require 'freakazoid/config'
   
   module Utils
-    include Krang::Utils
     include Config
     
+    def semaphore
+       @semaphore ||= Mutex.new
+    end
+        
     def reset_clever
       @clever = nil
     end
@@ -50,6 +53,15 @@ module Freakazoid
       users = metadata['users'] rescue nil
       
       users || []
+    end
+    
+    def parse_slug(slug)
+      slug = slug.downcase.split('@').last
+      author_name = slug.split('/')[0]
+      permlink = slug.split('/')[1..-1].join('/')
+      permlink = permlink.split('?')[0]
+        
+      [author_name, permlink]
     end
   end
 end

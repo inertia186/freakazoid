@@ -5,11 +5,11 @@
   :block_mode: irreversible
   
   # Account name for replying.
-  :account_name: <your STEEM bot name>
+  :account_name: <your Hive bot name>
   
   # Posting wif is used to reply with a comment.  See `support/reply.md` to
   # customize the comment.
-  :posting_wif: <your STEEM bot posting key>
+  :posting_wif: <your Hive bot posting key>
   
   # Register your bot and get a key: https://www.cleverbot.com/api/
   :cleverbot_api_key: <your cleverbot api key>
@@ -19,8 +19,9 @@
   :except_apps: freakazoid meep_bot
   
   # List of apps for this bot to pay attention to (whitelist).  Useful if you'd
-  # like to focus only on these apps/sites.
-  # :only_apps: steemit esteem chainbb streemian busy 
+  # like to focus only on these apps/sites/tribes.  This might also help avoid
+  # bot-on-bot loops, assuming these bots don't fake their app name.
+  # :only_apps: hiveblog peakd ecency leofinance stemgeeks weedcash sportstalksocial neoxiancity splintertalk anonramblings
   
   # When someone follows the bot and replies, the bot will follow them, if this
   # value is true.
@@ -40,5 +41,5 @@
   # get a list of accounts to mute, in addition to this bot's account_name.
   # :mirror_mute_account_names: 
 :chain_options:
-  :chain: steem
-  :url: https://api.steemit.com
+  :chain: hive
+  :url: http://anyx.io

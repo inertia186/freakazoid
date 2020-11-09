@@ -2,11 +2,76 @@ module Freakazoid
   require 'freakazoid/utils'
   
   module Chain
-    include Krang::Chain
     include Utils
+    
+    def reset_api
+      @api = nil
+    end
     
     def reset_follow_api
       @follow_api = nil
+    end
+    
+    def backoff
+      Random.rand(3..20)
+    end
+    
+    def with_api(&block)
+      loop do
+        @api ||= Radiator::Api.new(chain_options)
+        
+        return @api if block.nil?
+        
+        begin
+          yield @api
+          break
+        rescue Hive::ArgumentError => e
+          raise e
+        rescue => e
+          warn "API exception, retrying (#{e.class} :: #{e})"
+          puts e.backtrace.join("\n")
+          reset_api
+          sleep backoff
+          redo
+        end
+      end
+    end
+    
+    def reset_properties
+      @properties = nil
+      @latest_properties = nil
+    end
+    
+    def properties
+      if !@latest_properties.nil? && Time.now - @latest_properties > 30
+        @properties = nil
+        @latest_properties = nil
+      end
+      
+      return @properties unless @properties.nil?
+      
+      response = nil
+      with_api { |api| response = api.get_dynamic_global_properties }
+      response.result.tap do |properties|
+        @latest_properties = Time.parse(properties.time + 'Z')
+        @properties = properties
+      end
+    end
+    
+    def find_comment(author, permlink)
+      response = nil
+      
+      begin
+        with_api { |api| response = api.get_content(author, permlink) }
+      rescue Hive::ArgumentError
+        return nil
+      end
+      
+      comment = response.result
+      
+      warn comment if ENV['FREAKAZOID_TRACE']
+      
+      comment unless comment.id == 0
     end
     
     def follow_api
@@ -15,7 +80,7 @@ module Freakazoid
     
     def with_follow_api(&block)
       loop do
-        @follow_api ||= Radiator::FollowApi.new(chain_options)
+        @follow_api ||= Radiator::CondenserApi.new(chain_options)
         
         return @follow_api if block.nil?
         
@@ -23,7 +88,8 @@ module Freakazoid
           yield @follow_api
           break
         rescue => e
-          krang_warning "API exception, retrying (#{e})", e
+          warn "API exception, retrying (#{e.class} :: #{e})"
+          puts e.backtrace.join("\n")
           reset_follow_api
           sleep backoff
           redo
@@ -39,9 +105,9 @@ module Freakazoid
         count = followers.size
         response = nil
         with_follow_api do |follow_api|
-          response = follow_api.get_followers(account: account_name, start: followers.last, type: 'blog', limit: 1000)
+          response = follow_api.get_followers(account_name, followers.last, 'blog', 1000)
         end
-        followers += response.result.followers.map(&:follower)
+        followers += response.result.map(&:follower)
         followers = followers.uniq
       end
 
@@ -56,9 +122,9 @@ module Freakazoid
         count = following.size
         response = nil
         with_follow_api do |follow_api|
-          response = @follow_api.get_following(account: account_name, start: following.last, type: 'blog', limit: 100)
+          response = @follow_api.get_following(account_name, following.last, 'blog', 100)
         end
-        following += response.result.following.map(&:following)
+        following += response.result.map(&:following)
         following = following.uniq
       end
 
@@ -76,9 +142,9 @@ module Freakazoid
           count = ignores.size
           response = nil
           with_follow_api do |follow_api|
-            response = follow_api.get_following(account: ignoring_account_name, start: ignores.last, type: 'ignore', limit: 1000)
+            response = follow_api.get_following(ignoring_account_name, ignores.last, 'ignore', 1000)
           end
-          ignores += response.result.following.map(&:following)
+          ignores += response.result.map(&:following)
           ignores = ignores.uniq
         end
         
@@ -93,7 +159,7 @@ module Freakazoid
     def voted_for_authors
       @voted_for_authors ||= {}
       limit = if @voted_for_authors.empty?
-        10000
+        1000
       else
         300
       end
@@ -101,7 +167,8 @@ module Freakazoid
       semaphore.synchronize do
         response = nil
         with_api do |api| 
-          response = api.get_account_history(account_name, -limit, limit)
+          vote_operation_mask = 1
+          response = api.get_account_history(account_name, -limit, limit, vote_operation_mask)
         end
         result = response.result
         result.reverse.each do |i, tx|
@@ -142,7 +209,7 @@ module Freakazoid
       voters = comment.active_votes
       
       if voters.map(&:voter).include? account_name
-        krang_debug "Already voted for: #{comment.author}/#{comment.permlink} (id: #{comment.id})"
+        warn "Already voted for: #{comment.author}/#{comment.permlink} (id: #{comment.id})"
         true
       else
         false
@@ -164,8 +231,9 @@ module Freakazoid
         
         clever_response = clever.send_message(quote, comment.author)
       rescue => e
-        krang_error e.inspect, backtrace: e.backtrace
-        krang_debug 'Resetting cleverbot.'
+        warn e.inspect
+        puts e.backtrace.join("\n")
+        warn 'Resetting cleverbot.'
         reset_clever
       end
       
@@ -183,7 +251,7 @@ module Freakazoid
         parent_author = comment.parent_author
         votes = []
           
-        krang_debug "Replying to #{author}/#{permlink}"
+        puts "Replying to #{author}/#{permlink}"
       
         loop do
           merge_options = {
@@ -266,37 +334,38 @@ module Freakazoid
               response = tx.process(true)
             end
           rescue => e
-            krang_warning "Unable to reply: #{e}", e
+            warn "Unable to reply: #{e}"
+            puts e.backtrace.join("\n")
           end
           
           if !!response && !!response.error
             message = response.error.message
             if message.to_s =~ /You may only comment once every 20 seconds./
-              krang_warning "Retrying comment: commenting too quickly."
+              warn "Retrying comment: commenting too quickly."
               sleep Random.rand(20..40) # stagger retry
               redo
             elsif message.to_s =~ /STEEMIT_MAX_PERMLINK_LENGTH: permlink is too long/
-              krang_error "Failed comment: permlink too long"
+              warn "Failed comment: permlink too long"
               break
             elsif message.to_s =~ /missing required posting authority/
-              krang_error "Failed vote: Check posting key."
+              warn "Failed vote: Check posting key."
               break
             elsif message.to_s =~ /unknown key/
-              krang_error "Failed vote: unknown key (testing?)"
+              warn "Failed vote: unknown key (testing?)"
               break
             elsif message.to_s =~ /tapos_block_summary/
-              krang_warning "Retrying vote/comment: tapos_block_summary (?)"
+              warn "Retrying vote/comment: tapos_block_summary (?)"
               redo
             elsif message.to_s =~ /now < trx.expiration/
-              krang_warning "Retrying vote/comment: now < trx.expiration (?)"
+              warn "Retrying vote/comment: now < trx.expiration (?)"
               redo
             elsif message.to_s =~ /signature is not canonical/
-              krang_warning "Retrying vote/comment: signature was not canonical (bug in Radiator?)"
+              warn "Retrying vote/comment: signature was not canonical (bug in Radiator?)"
               redo
             end
           end
           
-          krang_info response unless response.nil?
+          puts response unless response.nil?
           
           break
         end
@@ -309,7 +378,8 @@ module Freakazoid
             tx.process(true)
           end
         rescue => e
-          krang_warning "Unable to vote: #{e}", e
+          warn "Unable to vote: #{e}"
+          puts e.backtrace.join("\n")
         end
       end
     end

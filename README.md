@@ -1,9 +1,14 @@
 freakazoid
 ==========
 
-[Freakazoid](https://github.com/inertia186/freakazoid) is a cleverbot integrated bot for STEEM.
+[Freakazoid](https://github.com/inertia186/freakazoid) is a cleverbot integrated bot for Hive.
 
-#### New Features
+#### Changes in v0.0.4
+
+* Hive / Eclipse Update
+* Gem Update
+
+#### Features
 
 * Added account name as Conversation ID so that Cleverbot maintains separate conversations with each account.
 * Now sending a random sub-string for interaction greater than 140 characters.  This is so long posts don't flood Cleverbot, but also makes it seem like the bot read a specific part of the post and is reacting to it, just like a typical human.
@@ -29,8 +34,6 @@ The main reference implementation of Freakazoid is @banjo.  For example:
 
 #### Install
 
-To use this [Radiator](https://steemit.com/steem/@inertia/radiator-steem-ruby-api-client) bot:
-
 ##### Linux
 
 ```bash
@@ -50,7 +53,7 @@ I've tested it on various versions of ruby.  The oldest one I got it to work was
 
 `ruby 2.0.0p645 (2015-04-13 revision 50299) [x86_64-darwin14.4.0]`
 
-You can try the system version of `ruby`, but if you have issues with that, use this [how-to](https://steemit.com/ruby/@inertia/how-to-configure-your-mac-to-do-ruby-on-rails-development), and come back to this installation at Step 4:
+You can try the system version of `ruby`, but if you have issues with that, use this [how-to](https://hive.blog/ruby/@inertia/how-to-configure-your-mac-to-do-ruby-on-rails-development), and come back to this installation at Step 4:
 
 ##### Setup
 
@@ -69,13 +72,13 @@ Edit the `config.yml` file.
 ```yaml
 :freakazoid:
   :block_mode: irreversible
-  :account_name: <your STEEM bot name>
-  :posting_wif: <your STEEM bot posting key>
+  :account_name: <your Hive bot name>
+  :posting_wif: <your Hive bot posting key>
   :cleverbot_api_key: <your cleverbot api key>
 
 :chain_options:
-  :chain: steem
-  :url: https://api.steemit.com
+  :chain: hive
+  :url: https://api.hive.blog
 ```
 
 In order to integrate with Cleverbot, you need to register your bot and get a key: https://www.cleverbot.com/api/
@@ -134,9 +137,9 @@ Make sure the `.yml` file contains the correct voting key and account name (`soc
 
 Is there a list of nodes?
 
-##### Solution: Yes, special thanks to @ripplerm.
+##### Solution: Yes, special thanks to @holger80.
 
-https://ripplerm.github.io/steem-servers/
+https://hive.blog/@fullnodeupdate
 
 ---
 
@@ -153,7 +156,7 @@ https://ripplerm.github.io/steem-servers/
 
 ## Get in touch!
 
-If you're using Freakazoid, I'd love to hear from you.  Drop me a line and tell me what you think!  I'm @inertia on STEEM and Discord.
+If you're using Freakazoid, I'd love to hear from you.  Drop me a line and tell me what you think!  I'm @inertia on Hive and Discord.
   
 ## License
 

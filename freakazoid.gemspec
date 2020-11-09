@@ -18,19 +18,18 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.15', '>= 1.15.4'
-  spec.add_development_dependency 'rake', '~> 12.1', '>= 12.1.0'
-  spec.add_development_dependency 'minitest', '5.10.3'
+  spec.add_development_dependency 'rake', '~> 13.0', '>= 13.0.1'
+  spec.add_development_dependency 'minitest', '5.14.2'
   spec.add_development_dependency 'minitest-line', '~> 0.6.3'
   spec.add_development_dependency 'minitest-proveit'
   spec.add_development_dependency 'webmock', '~> 3.1', '>= 3.1.0'
-  spec.add_development_dependency 'vcr', '~> 3.0', '>= 3.0.3'
-  spec.add_development_dependency 'simplecov', '~> 0.15.1'
+  spec.add_development_dependency 'vcr', '~> 6.0', '>= 6.0.0'
+  spec.add_development_dependency 'simplecov', '~> 0.19.1'
   spec.add_development_dependency 'yard', '~> 0.9.9'
-  spec.add_development_dependency 'pry', '~> 0.11.1'
+  spec.add_development_dependency 'pry', '~> 0.13.1'
   spec.add_development_dependency 'awesome_print', '~> 1.7', '>= 1.7.0'
   spec.add_development_dependency 'delorean', '~> 2.1', '>= 2.1.0'
 
-  spec.add_dependency 'krang'
   spec.add_dependency 'rest-client', '~> 2.0', '>= 2.0.2' # required by ruby-cleverbot-api
   spec.add_dependency 'ruby-cleverbot-api', '~> 1.0', '>= 1.0.6'
   spec.add_dependency 'rdiscount', '~> 2.2', '>= 2.2.0.1'
