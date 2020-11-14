@@ -32,9 +32,9 @@ module Freakazoid
           Redis.new(url: meeseeker_options[:url]).subscribe('hive:op:comment') do |on|
             on.message do |_, message|
               payload = JSON[message]
-              comment = Hashie::Mash.new(JSON[ctx.get(payload["key"])]).value
+              comment = Hashie::Mash.new(JSON[ctx.get(payload["key"])]).value rescue nil
               
-              process_comment(comment)
+              process_comment(comment) if !!comment
             end
           end
         else
