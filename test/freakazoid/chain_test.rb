@@ -52,7 +52,7 @@ module Freakazoid
     end
     
     def test_comment_bogus
-      assert_nil find_comment('bogus', 'bogus')
+      assert_nil find_comment('bogus', 'bogus', timeout: 3)
     end
     
     def test_followed_by

@@ -58,32 +58,66 @@ module Freakazoid
       end
     end
     
-    def find_comment(author, permlink)
+    def find_comment(author, permlink, options = {timeout: 63})
       # Poll for this comment 21 times, in case we saw it in head block mode, to
       # also account for the delay time that might be present in the hivemind
       # blockchain interpretor layer.
       
-      21.times do |try_num|
+      timeout = options[:timeout] || 63
+      
+      (timeout / 3).times do |try_num|
         response = nil
         
         begin
-          with_api { |api| response = api.get_content(author, permlink) }
+          with_api do |api|
+            api.get_content(author, permlink) do |result|
+              comment = result
+              
+              warn comment if ENV['FREAKAZOID_TRACE']
+              
+              return comment
+            end
+          end
         rescue Hive::ArgumentError
-          if ENV['FREAKAZOID_TRACE']
-            warn "Did not see #{author}/#{permlink} on chain.  (attempt: #{try_num})."
+          # Here, we check the author's blog to see if there's a reason to keep
+          # checking or not.
+          in_blog = false
+          
+          with_api do |api|
+            comment_operation_mask = 0x02
+            
+            api.get_account_history(author, -1, 100, comment_operation_mask) do |history|
+              history.each do |index, tx|
+                op_type, op_value = tx.op
+                
+                next unless op_type == 'comment'
+                
+                if op_value.permlink == permlink
+                  # We found it!
+                  in_blog = true
+                  
+                  break
+                end
+              end
+            end
           end
           
-          sleep 3
-          
-          next
+          if in_blog
+            # We detected the content in the blockchain but it hasn't reached
+            # "get_content" yet.  So we just need to wait for a bit.
+            
+            if ENV['FREAKAZOID_TRACE']
+              warn "Did not see #{author}/#{permlink} on chain.  (attempt: #{try_num})."
+            end
+            
+            sleep 3
+            
+            next
+          end
         end
-        
-        comment = response.result
-        
-        warn comment if ENV['FREAKAZOID_TRACE']
-        
-        return comment
       end
+      
+      return nil
     end
     
     def follow_api
@@ -180,18 +214,18 @@ module Freakazoid
         response = nil
         with_api do |api| 
           vote_operation_mask = 1
-          response = api.get_account_history(account_name, -limit, limit, vote_operation_mask)
+          response = api.get_account_history(account_name, -1, limit, vote_operation_mask)
         end
         result = response.result
         result.reverse.each do |i, tx|
-          op = tx['op']
-          next unless op[0] == 'vote'
+          op_type, op_value = tx.op
+          next unless op_type == 'vote'
           
-          timestamp = Time.parse(tx['timestamp'] + 'Z')
-          latest = @voted_for_authors[op[1]['author']]
+          timestamp = Time.parse(tx.timestamp + 'Z')
+          latest = @voted_for_authors[op_value.author]
           
           if latest.nil? || latest < timestamp
-            @voted_for_authors[op[1]['author']] = timestamp
+            @voted_for_authors[op_value.author] = timestamp
           end
         end
       end
