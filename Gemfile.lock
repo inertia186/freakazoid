@@ -77,7 +77,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.6)
-    radiator (0.4.8.pre.3)
+    radiator (0.4.8)
       awesome_print (~> 1.7, >= 1.7.0)
       bitcoin-ruby (= 0.0.20)
       ffi (~> 1.9, >= 1.9.18)
@@ -91,7 +91,7 @@ GEM
     rb-readline (0.5.5)
     rdiscount (2.2.0.2)
     redis (4.2.2)
-    reline (0.1.7)
+    reline (0.1.8)
       io-console (~> 0.5)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
@@ -116,7 +116,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     vcr (6.0.0)
-    webmock (3.9.4)
+    webmock (3.9.5)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
@@ -135,7 +135,7 @@ DEPENDENCIES
   minitest-line (~> 0.6.3)
   minitest-proveit
   pry (~> 0.13.1)
-  radiator (= 0.4.8.pre.3)
+  radiator
   rake (~> 13.0, >= 13.0.1)
   rb-readline
   ruby-cleverbot-api!
