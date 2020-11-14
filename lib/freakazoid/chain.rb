@@ -73,7 +73,7 @@ module Freakazoid
             api.get_content(author, permlink) do |result|
               comment = result
               
-              warn comment if ENV['FREAKAZOID_TRACE']
+              warn comment if !!ENV['FREAKAZOID_TRACE']
               
               return comment
             end
@@ -85,20 +85,31 @@ module Freakazoid
           
           with_api do |api|
             comment_operation_mask = 0x02
+            get_account_history_options = [author, -1, 100, comment_operation_mask]
             
-            api.get_account_history(author, -1, 100, comment_operation_mask) do |history|
-              history.each do |index, tx|
-                op_type, op_value = tx.op
-                
-                next unless op_type == 'comment'
-                
-                if op_value.permlink == permlink
-                  # We found it!
-                  in_blog = true
-                  
-                  break
+            loop do
+              begin
+                api.get_account_history(*get_account_history_options) do |history|
+                  history.each do |index, tx|
+                    op_type, op_value = tx.op
+                    
+                    next unless op_type == 'comment'
+                    
+                    if op_value.permlink == permlink
+                      # We found it!
+                      in_blog = true
+                      
+                      break
+                    end
+                  end
                 end
+              rescue Hive::ArgumentError => e
+                warn "Unable to filter on comment operations, retrying without filter.  (#{e})" if !!ENV['FREAKAZOID_TRACE']
+                get_account_history_options = [author, -1, 100]
+                redo
               end
+              
+              break
             end
           end
           
@@ -106,7 +117,7 @@ module Freakazoid
             # We detected the content in the blockchain but it hasn't reached
             # "get_content" yet.  So we just need to wait for a bit.
             
-            if ENV['FREAKAZOID_TRACE']
+            if !!ENV['FREAKAZOID_TRACE']
               warn "Did not see #{author}/#{permlink} on chain.  (attempt: #{try_num})."
             end
             
@@ -212,10 +223,23 @@ module Freakazoid
       
       semaphore.synchronize do
         response = nil
-        with_api do |api| 
-          vote_operation_mask = 1
-          response = api.get_account_history(account_name, -1, limit, vote_operation_mask)
+        vote_operation_mask = 1
+        get_account_history_options = [account_name, -1, limit, vote_operation_mask]
+        
+        loop do
+          begin
+            with_api do |api| 
+              response = api.get_account_history(*get_account_history_options)
+            end
+          rescue Hive::ArgumentError => e
+            warn "Unable to filter on vote operations, retrying without filter.  (#{e})" if !!ENV['FREAKAZOID_TRACE']
+            get_account_history_options = [account_name, -1, limit]
+            redo
+          end
+          
+          break
         end
+        
         result = response.result
         result.reverse.each do |i, tx|
           op_type, op_value = tx.op

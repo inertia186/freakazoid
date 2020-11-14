@@ -60,7 +60,7 @@ module Freakazoid
           self_vote_weight: '2.00 %'
         }, chain_options: {
           chain: 'hive',
-          url: 'https://api.hive.blog'
+          url: ['https://api.hive.blog', 'http://anyx.io'].sample
         }
       }
     end
