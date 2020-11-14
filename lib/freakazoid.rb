@@ -68,8 +68,13 @@ module Freakazoid
     else
       # Not a reply, check if there's a mention instead.
       users = extract_users(metadata)
-      return unless users.include? account_name
-      puts "Mention of #{account_name} by #{comment.author}"
+      if users.include? account_name
+        puts "Mention of #{account_name} by #{comment.author} (in json_metadata)"
+      elsif comment.body =~ /@#{account_name}/
+        puts "Mention of #{account_name} by #{comment.author} (in body)"
+      else
+        return
+      end
     end
     
     reply(find_comment(comment.author, comment.permlink))
