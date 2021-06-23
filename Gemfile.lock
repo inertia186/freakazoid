@@ -20,7 +20,7 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     awesome_print (1.8.0)
     base58 (0.2.3)
-    bindata (2.4.8)
+    bindata (2.4.10)
     bitcoin-ruby (0.0.20)
       eventmachine
       ffi
