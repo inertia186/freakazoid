@@ -16,8 +16,8 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.7.0)
-      public_suffix (>= 2.0.2, < 5.0)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
     awesome_print (1.8.0)
     base58 (0.2.3)
     bindata (2.4.8)
@@ -76,7 +76,7 @@ GEM
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    public_suffix (4.0.6)
+    public_suffix (5.0.0)
     radiator (0.4.8)
       awesome_print (~> 1.7, >= 1.7.0)
       bitcoin-ruby (= 0.0.20)
